@@ -8,6 +8,7 @@ env:
   DOCKER_IMAGE: vaibzz7219/deployflow
 
 jobs:
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -41,9 +42,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Image
+      - name: Build Docker Image
         run: |
           docker build -t vaibzz7219/deployflow:latest .
+
+      - name: Push Docker Image
+        run: |
           docker push vaibzz7219/deployflow:latest
 
   deploy:
@@ -58,10 +62,16 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull vaibzz7219/deployflow:latest
-            docker stop deployflow-app || true
-            docker rm deployflow-app || true
-            docker run -d \
+            sudo docker pull vaibzz7219/deployflow:latest
+
+            # Stop all running containers
+            sudo docker stop $(sudo docker ps -q) || true
+
+            # Remove all containers
+            sudo docker rm $(sudo docker ps -aq) || true
+
+            # Run fresh container
+            sudo docker run -d \
               --name deployflow-app \
               -p 8000:8000 \
               vaibzz7219/deployflow:latest
