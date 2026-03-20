@@ -1,0 +1,25 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH into EC2 and deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd deployflow-aws-ci-cd-pipeline
+            git pull origin main
+            docker stop $(docker ps -q) || true
+            docker rm $(docker ps -aq) || true
+            docker build -t python-app .
+            docker run -d -p 8000:8000 python-app
