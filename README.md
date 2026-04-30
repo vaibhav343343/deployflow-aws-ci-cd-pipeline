@@ -110,8 +110,8 @@ docker run -d -p 8000:8000 deployflow
 ## 👨‍💻 Author
 
 **Vaibhav Sudrik**
-2026
-Cloud Computing Student 🚀
+* 2026
+* Cloud Computing Student 🚀
 
 ---
 
